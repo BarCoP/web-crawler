@@ -7,13 +7,31 @@ function scanImagesInWeb() {
 		);
 	} else {
 		// the user entered the correct arguments:
-		const [node, fileLocation, urlInput, depthInput] = process.argv;
+		const [_, __, urlInput, depthInput] = process.argv;
 		let isValidArguments = checkValidityOfInputs(urlInput, depthInput);
 
 		if (!isValidArguments) {
 			console.log(`you need to entered a valid arguments!`);
 		} else {
-			// everything is valid, now we can scan
+			let result1 = {
+				imageUrl: 'www.sport5.com/image-1',
+				sourceUrl: 'www.sport5.com',
+				depth: 0,
+			};
+			let result2 = {
+				imageUrl: 'www.sport5.com/games/image-2',
+				sourceUrl: 'www.sport5.com/games',
+				depth: 1,
+			};
+
+			let obj = {
+				results: [],
+			};
+
+			obj.results.push(result1, result2);
+			console.log(obj);
+
+			writeResults2JSONFile(obj);
 		}
 	}
 }
@@ -29,4 +47,16 @@ function checkValidityOfInputs(urlInput, depthInput) {
 
 	return urlValid && depthValid;
 }
+
+function writeResults2JSONFile(obj) {
+	let json = JSON.stringify(obj);
+	let fs = require('fs');
+	fs.writeFile('results.json', json, 'utf8', (err) => {
+		if (err) console.log(err);
+		else {
+			console.log('File written successfully\n');
+		}
+	});
+}
+
 scanImagesInWeb();
