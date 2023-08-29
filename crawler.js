@@ -1,4 +1,6 @@
 const ARGUMENTS_NUMBER = 4;
+const URL_RE =
+	/(https:\/\/www\.|http:\/\/www\.|https:\/\/|http:\/\/)?[a-zA-Z]{2,}(\.[a-zA-Z]{2,})(\.[a-zA-Z]{2,})?\/[a-zA-Z0-9]{2,}|((https:\/\/www\.|http:\/\/www\.|https:\/\/|http:\/\/)?[a-zA-Z]{2,}(\.[a-zA-Z]{2,})(\.[a-zA-Z]{2,})?)|(https:\/\/www\.|http:\/\/www\.|https:\/\/|http:\/\/)?[a-zA-Z0-9]{2,}\.[a-zA-Z0-9]{2,}\.[a-zA-Z0-9]{2,}(\.[a-zA-Z0-9]{2,})?/g;
 
 function scanImagesInWeb() {
 	if (process.argv.length !== 4) {
@@ -38,10 +40,8 @@ function scanImagesInWeb() {
 
 function checkValidityOfInputs(urlInput, depthInput) {
 	// if there is more time we should check the edge-cases for this pattern
-	const urlRe =
-		/(https:\/\/www\.|http:\/\/www\.|https:\/\/|http:\/\/)?[a-zA-Z]{2,}(\.[a-zA-Z]{2,})(\.[a-zA-Z]{2,})?\/[a-zA-Z0-9]{2,}|((https:\/\/www\.|http:\/\/www\.|https:\/\/|http:\/\/)?[a-zA-Z]{2,}(\.[a-zA-Z]{2,})(\.[a-zA-Z]{2,})?)|(https:\/\/www\.|http:\/\/www\.|https:\/\/|http:\/\/)?[a-zA-Z0-9]{2,}\.[a-zA-Z0-9]{2,}\.[a-zA-Z0-9]{2,}(\.[a-zA-Z0-9]{2,})?/g;
 
-	let urlValid = urlRe.test(urlInput);
+	let urlValid = URL_RE.test(urlInput);
 	console.log(urlValid);
 	let depthValid = depthInput > 0 ? true : false;
 
@@ -49,6 +49,8 @@ function checkValidityOfInputs(urlInput, depthInput) {
 }
 
 function writeResults2JSONFile(obj) {
+	// if there is time left - check how to order the output in json file to be human-readable by default
+
 	let json = JSON.stringify(obj);
 	let fs = require('fs');
 	fs.writeFile('results.json', json, 'utf8', (err) => {
