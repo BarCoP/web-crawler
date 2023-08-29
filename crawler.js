@@ -8,12 +8,25 @@ function scanImagesInWeb() {
 	} else {
 		// the user entered the correct arguments:
 		const [node, fileLocation, urlInput, depthInput] = process.argv;
-		console.log(`url input: ${urlInput}`);
-		console.log(`depth input: ${depthInput}`);
+		let isValidArguments = checkValidityOfInputs(urlInput, depthInput);
 
-		// process.argv.forEach(function (val, index, array) {
-		// 	console.log(index + ': ' + val);
+		if (!isValidArguments) {
+			console.log(`you need to entered a valid arguments!`);
+		} else {
+			// everything is valid, now we can scan
+		}
 	}
 }
 
+function checkValidityOfInputs(urlInput, depthInput) {
+	// if there is more time we should check the edge-cases for this pattern
+	const urlRe =
+		/(https:\/\/www\.|http:\/\/www\.|https:\/\/|http:\/\/)?[a-zA-Z]{2,}(\.[a-zA-Z]{2,})(\.[a-zA-Z]{2,})?\/[a-zA-Z0-9]{2,}|((https:\/\/www\.|http:\/\/www\.|https:\/\/|http:\/\/)?[a-zA-Z]{2,}(\.[a-zA-Z]{2,})(\.[a-zA-Z]{2,})?)|(https:\/\/www\.|http:\/\/www\.|https:\/\/|http:\/\/)?[a-zA-Z0-9]{2,}\.[a-zA-Z0-9]{2,}\.[a-zA-Z0-9]{2,}(\.[a-zA-Z0-9]{2,})?/g;
+
+	let urlValid = urlRe.test(urlInput);
+	console.log(urlValid);
+	let depthValid = depthInput > 0 ? true : false;
+
+	return urlValid && depthValid;
+}
 scanImagesInWeb();
