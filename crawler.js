@@ -5,7 +5,9 @@ const ARGUMENTS_NUMBER = 4;
 const URL_RE =
 	/(https:\/\/www\.|http:\/\/www\.|https:\/\/|http:\/\/)?[a-zA-Z]{2,}(\.[a-zA-Z]{2,})(\.[a-zA-Z]{2,})?\/[a-zA-Z0-9]{2,}|((https:\/\/www\.|http:\/\/www\.|https:\/\/|http:\/\/)?[a-zA-Z]{2,}(\.[a-zA-Z]{2,})(\.[a-zA-Z]{2,})?)|(https:\/\/www\.|http:\/\/www\.|https:\/\/|http:\/\/)?[a-zA-Z0-9]{2,}\.[a-zA-Z0-9]{2,}\.[a-zA-Z0-9]{2,}(\.[a-zA-Z0-9]{2,})?/g;
 
-let obj = null;
+let obj = {
+	results: [],
+};
 
 async function scanImagesInWeb() {
 	if (process.argv.length !== ARGUMENTS_NUMBER) {
@@ -23,28 +25,15 @@ async function scanImagesInWeb() {
 			);
 		} else {
 			// implement the core-logics of retrieving from a website the relevant data
-			calculateCurrentDepthImages(urlInput, 0, depthInput);
+
+			await calculateCurrentDepthImages(urlInput, 0, depthInput);
+
+			// console.log(obj.results);`
 
 			// did not make it with the time-limit, wrote about it in README my thoughts
 
 			//==============================================================
 			// working on storing the results in json file including bulding array-demo with false data;
-			let result1 = {
-				imageUrl: 'www.sport5.com/image-1',
-				sourceUrl: 'www.sport5.com',
-				depth: 0,
-			};
-			let result2 = {
-				imageUrl: 'www.sport5.com/games/image-2',
-				sourceUrl: 'www.sport5.com/games',
-				depth: 1,
-			};
-
-			obj = {
-				results: [],
-			};
-
-			obj.results.push(result1, result2);
 
 			writeResults2JSONFile(obj);
 		}
@@ -75,18 +64,30 @@ function writeResults2JSONFile(obj) {
 }
 
 const calculateCurrentDepthImages = async (url, counter, depth) => {
-	const pageHTML = await axios.get(url);
+	console.log(url, counter, depth);
+	if (counter > depth) {
+		return;
+	}
+	try {
+		const pageHTML = await axios.get(url);
 
-	const $ = cheerio.load(pageHTML.data);
+		const $ = cheerio.load(pageHTML.data);
 
-	$('img').each((_, el) => {
-		obj.results.push({
-			imageUrl: $(el).attr('src'),
-			sourceUrl: url,
-			depth: counter,
+		$('img').each((_, el) => {
+			obj.results.push({
+				imageUrl: $(el).attr('src'),
+				sourceUrl: url,
+				depth: counter,
+			});
 		});
-	});
-	console.log(obj);
+
+		$('a').each(async (_, el) => {
+			// console.log($(el).attr('href'));
+			await calculateCurrentDepthImages($(el).attr('href'), counter + 1, depth);
+		});
+	} catch {
+		return;
+	}
 };
 
 // run main function:
