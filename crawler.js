@@ -17,6 +17,11 @@ function scanImagesInWeb() {
 				`you need to entered a valid arguments!, please run the command again.`
 			);
 		} else {
+			// implement the core-logics of retrieving from a website the relevant data
+
+			// did not make it with the time-limit, wrote about it in README my thoughts
+
+			//==============================================================
 			// working on storing the results in json file including bulding array-demo with false data;
 			let result1 = {
 				imageUrl: 'www.sport5.com/image-1',
