@@ -26,7 +26,7 @@ async function scanImagesInWeb() {
 		} else {
 			// implement the core-logics of retrieving from a website the relevant data
 
-			await calculateCurrentDepthImages(urlInput, 0, depthInput);
+			await calculateCurrentDepthImages(urlInput, depthInput);
 
 			// console.log(obj.results);`
 
@@ -63,30 +63,34 @@ function writeResults2JSONFile(obj) {
 	});
 }
 
-const calculateCurrentDepthImages = async (url, counter, depth) => {
-	console.log(url, counter, depth);
-	if (counter > depth) {
-		return;
-	}
-	try {
-		const pageHTML = await axios.get(url);
+const calculateCurrentDepthImages = async (url, depth) => {
+	// if (counter > depth) {
+	// 	return;
+	// }
+	const qArr = [[url, 0]];
+	while (qArr.length > 0) {
+		const cur = qArr.pop();
+		console.log(cur);
 
-		const $ = cheerio.load(pageHTML.data);
+		try {
+			const html = await axios.get(cur[0]);
+			const $ = cheerio.load(html.data);
 
-		$('img').each((_, el) => {
-			obj.results.push({
-				imageUrl: $(el).attr('src'),
-				sourceUrl: url,
-				depth: counter,
+			$('img').each((_, el) => {
+				obj.results.push({
+					imageUrl: $(el).attr('src'),
+					sourceUrl: url,
+					depth: cur[1],
+				});
 			});
-		});
-
-		$('a').each(async (_, el) => {
-			// console.log($(el).attr('href'));
-			await calculateCurrentDepthImages($(el).attr('href'), counter + 1, depth);
-		});
-	} catch {
-		return;
+			if (cur[1] + 1 <= depth) {
+				$('a').each((_, el) => {
+					qArr.push([$(el).attr('href'), cur[1] + 1]);
+				});
+			}
+		} catch (err) {
+			console.log(err);
+		}
 	}
 };
 
