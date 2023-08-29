@@ -1,8 +1,13 @@
+const axios = require('axios');
+const cheerio = require('cheerio');
+
 const ARGUMENTS_NUMBER = 4;
 const URL_RE =
 	/(https:\/\/www\.|http:\/\/www\.|https:\/\/|http:\/\/)?[a-zA-Z]{2,}(\.[a-zA-Z]{2,})(\.[a-zA-Z]{2,})?\/[a-zA-Z0-9]{2,}|((https:\/\/www\.|http:\/\/www\.|https:\/\/|http:\/\/)?[a-zA-Z]{2,}(\.[a-zA-Z]{2,})(\.[a-zA-Z]{2,})?)|(https:\/\/www\.|http:\/\/www\.|https:\/\/|http:\/\/)?[a-zA-Z0-9]{2,}\.[a-zA-Z0-9]{2,}\.[a-zA-Z0-9]{2,}(\.[a-zA-Z0-9]{2,})?/g;
 
-function scanImagesInWeb() {
+let obj = null;
+
+async function scanImagesInWeb() {
 	if (process.argv.length !== ARGUMENTS_NUMBER) {
 		console.log(
 			`wrong amount of argument, make sure you enter ${ARGUMENTS_NUMBER} arguments by the format: "node crawler.js <url: string> <depth: number>", please run the command again.`
@@ -18,6 +23,7 @@ function scanImagesInWeb() {
 			);
 		} else {
 			// implement the core-logics of retrieving from a website the relevant data
+			calculateCurrentDepthImages(urlInput, 0, depthInput);
 
 			// did not make it with the time-limit, wrote about it in README my thoughts
 
@@ -34,12 +40,11 @@ function scanImagesInWeb() {
 				depth: 1,
 			};
 
-			let obj = {
+			obj = {
 				results: [],
 			};
 
 			obj.results.push(result1, result2);
-			console.log(obj);
 
 			writeResults2JSONFile(obj);
 		}
@@ -51,7 +56,7 @@ function checkValidityOfInputs(urlInput, depthInput) {
 
 	let urlValid = URL_RE.test(urlInput);
 	console.log(urlValid);
-	let depthValid = depthInput > 0 ? true : false;
+	let depthValid = depthInput >= 0 ? true : false;
 
 	return urlValid && depthValid;
 }
@@ -68,6 +73,21 @@ function writeResults2JSONFile(obj) {
 		}
 	});
 }
+
+const calculateCurrentDepthImages = async (url, counter, depth) => {
+	const pageHTML = await axios.get(url);
+
+	const $ = cheerio.load(pageHTML.data);
+
+	$('img').each((_, el) => {
+		obj.results.push({
+			imageUrl: $(el).attr('src'),
+			sourceUrl: url,
+			depth: counter,
+		});
+	});
+	console.log(obj);
+};
 
 // run main function:
 scanImagesInWeb();
