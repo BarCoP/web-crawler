@@ -65,3 +65,7 @@ I also want to see if I could solve it by using angular (my home playground) and
 thank your for your time to read it!
 
 Bar Peretz
+
+### update
+
+now the program can get the img data and the links, but when depth > 1 the results.json will be written only after the programe will finsh to run all over the links which can take a times (more then 5 minutes at least)
