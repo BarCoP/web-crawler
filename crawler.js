@@ -1,5 +1,5 @@
-const axios = require('axios');
-const cheerio = require('cheerio');
+import { get } from 'axios';
+import { load } from 'cheerio';
 
 const ARGUMENTS_NUMBER = 4;
 const URL_RE =
@@ -64,17 +64,14 @@ function writeResults2JSONFile(obj) {
 }
 
 const calculateCurrentDepthImages = async (url, depth) => {
-	// if (counter > depth) {
-	// 	return;
-	// }
 	const qArr = [[url, 0]];
 	while (qArr.length > 0) {
 		const cur = qArr.pop();
 		console.log(cur);
 
 		try {
-			const html = await axios.get(cur[0]);
-			const $ = cheerio.load(html.data);
+			const html = await get(cur[0]);
+			const $ = load(html.data);
 
 			$('img').each((_, el) => {
 				obj.results.push({
