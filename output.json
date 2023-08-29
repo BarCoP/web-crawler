@@ -1,0 +1,9 @@
+{
+	"results": [
+		{
+			"imageUrl": "string",
+			"sourceUrl": "string",
+			"depth": "number"
+		}
+	]
+}
